@@ -48,5 +48,66 @@ for (const park of featuredParks) {
     console.log(`${park.name}: ${park.knownFor}; try ${park.activity}.`);
 }
 
-completedHikes += 1;
-console.log("Completed hikes after today's trail:", completedHikes);
+console.log("Completed hikes before using the planner:", completedHikes);
+
+const checklistTitle = document.querySelector("#checklist-title");
+const checklistIntro = document.querySelector("#checklist-intro");
+const packingList = document.querySelector("#packing-list");
+const hikeStatus = document.querySelector("#hike-status");
+const completeHikeButton = document.querySelector("#complete-hike");
+const trailForm = document.querySelector("#trail-form");
+const trailNameInput = document.querySelector("#trail-name");
+const trailFeedback = document.querySelector("#trail-feedback");
+const plannedTrails = document.querySelector("#planned-trails");
+const originalChecklistIntro = checklistIntro.textContent;
+
+console.log(`${checklistTitle.textContent} includes ${packingList.children.length} items.`);
+
+completeHikeButton.addEventListener("click", () => {
+    const isComplete = completeHikeButton.dataset.completed !== "true";
+    completeHikeButton.dataset.completed = String(isComplete);
+    completeHikeButton.setAttribute("aria-pressed", String(isComplete));
+    completeHikeButton.textContent = isComplete ? "Undo completed hike" : "Mark a hike complete";
+    hikeStatus.classList.toggle("is-complete", isComplete);
+    hikeStatus.dataset.state = isComplete ? "complete" : "ready";
+
+    if (isComplete) {
+        completedHikes += 1;
+        hikeStatus.textContent = `Hike complete. You have completed ${completedHikes} of ${plannedHikes} planned hikes.`;
+        checklistIntro.textContent = "Nice work. Keep using the checklist to prepare for your next trail.";
+    } else {
+        completedHikes -= 1;
+        hikeStatus.textContent = "Hike completion undone. Mark it complete when you are ready.";
+        checklistIntro.textContent = originalChecklistIntro;
+    }
+
+    console.log(hikeStatus.textContent);
+});
+
+trailForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const trailName = trailNameInput.value.trim();
+
+    if (!trailName) {
+        trailNameInput.focus();
+        return;
+    }
+
+    const duplicateTrail = [...plannedTrails.querySelectorAll("[data-trail-name]")]
+        .some((trail) => trail.dataset.trailName.toLowerCase() === trailName.toLowerCase());
+
+    if (duplicateTrail) {
+        trailFeedback.textContent = `${trailName} is already on your trail list.`;
+        console.log("Skipped duplicate trail:", trailName);
+        return;
+    }
+
+    const trailItem = document.createElement("li");
+    trailItem.textContent = trailName;
+    trailItem.dataset.trailName = trailName;
+    trailItem.classList.add("is-planned");
+    plannedTrails.append(trailItem);
+    trailFeedback.textContent = `Added ${trailName} to your trail ideas.`;
+    trailNameInput.value = "";
+    console.log("Added trail idea:", trailItem.dataset.trailName);
+});

@@ -65,15 +65,32 @@
         </section>
 
         <section id="checklist">
-            <h2>What to Bring on a Hike</h2>
-            <p>A thoughtful packing list helps a hike stay comfortable and safe. The right gear depends on the trail length, weather, and season.</p>
-            <ul>
+            <h2 id="checklist-title">What to Bring on a Hike</h2>
+            <p id="checklist-intro">A thoughtful packing list helps a hike stay comfortable and safe. The right gear depends on the trail length, weather, and season.</p>
+            <ul id="packing-list">
                 <li>Water and a snack</li>
                 <li>A trail map or downloaded route</li>
                 <li>Comfortable shoes with good traction</li>
                 <li>Sun protection, such as sunscreen and a hat</li>
                 <li>A small first-aid kit</li>
             </ul>
+
+            <div class="trail-tools">
+                <h3>Track a hike</h3>
+                <p id="hike-status" class="hike-status" data-state="ready" aria-live="polite">No hike marked complete yet.</p>
+                <button id="complete-hike" class="action-button" type="button" data-completed="false" aria-pressed="false">Mark a hike complete</button>
+
+                <h3>Add a trail idea</h3>
+                <form id="trail-form">
+                    <label for="trail-name">Trail name</label>
+                    <div class="trail-form-controls">
+                        <input id="trail-name" name="trailName" type="text" maxlength="60" placeholder="For example, Mist Trail" required>
+                        <button class="action-button" type="submit">Add trail</button>
+                    </div>
+                </form>
+                <p id="trail-feedback" class="trail-feedback" role="status" aria-live="polite"></p>
+                <ul id="planned-trails" class="planned-trails" aria-label="Planned trail ideas"></ul>
+            </div>
         </section>
     </main>
 
