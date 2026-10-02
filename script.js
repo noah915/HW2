@@ -59,7 +59,33 @@ const trailForm = document.querySelector("#trail-form");
 const trailNameInput = document.querySelector("#trail-name");
 const trailFeedback = document.querySelector("#trail-feedback");
 const plannedTrails = document.querySelector("#planned-trails");
+const hikeRequestForm = document.querySelector("#hike-request-form");
+const hikeRequestFields = {
+    name: document.querySelector("#hiker-name"),
+    email: document.querySelector("#hiker-email"),
+    park: document.querySelector("#hike-park"),
+    date: document.querySelector("#hike-date"),
+    miles: document.querySelector("#hike-miles"),
+    experience: document.querySelector("#hiking-experience")
+};
+const hikeRequestErrors = {
+    name: document.querySelector("#hiker-name-error"),
+    email: document.querySelector("#hiker-email-error"),
+    park: document.querySelector("#hike-park-error"),
+    date: document.querySelector("#hike-date-error"),
+    miles: document.querySelector("#hike-miles-error"),
+    experience: document.querySelector("#hiking-experience-error")
+};
+const hikeRequestFeedback = document.querySelector("#hike-request-feedback");
 const originalChecklistIntro = checklistIntro.textContent;
+const allowedParks = new Set(featuredParks.map((park) => park.name));
+
+function getLocalDateString(date = new Date()) {
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return localDate.toISOString().slice(0, 10);
+}
+
+hikeRequestFields.date.min = getLocalDateString();
 
 console.log(`${checklistTitle.textContent} includes ${packingList.children.length} items.`);
 
@@ -110,4 +136,123 @@ trailForm.addEventListener("submit", (event) => {
     trailFeedback.textContent = `Added ${trailName} to your trail ideas.`;
     trailNameInput.value = "";
     console.log("Added trail idea:", trailItem.dataset.trailName);
+});
+
+function readHikeRequest() {
+    const milesValue = hikeRequestFields.miles.value.trim();
+
+    return {
+        name: hikeRequestFields.name.value.trim(),
+        email: hikeRequestFields.email.value.trim(),
+        park: hikeRequestFields.park.value,
+        date: hikeRequestFields.date.value,
+        miles: milesValue === "" ? null : Number(milesValue),
+        experience: hikeRequestFields.experience.value
+    };
+}
+
+function validateHikeRequest(values) {
+    const errors = {};
+    const experienceDistanceLimits = {
+        beginner: 5,
+        intermediate: 10,
+        experienced: 15
+    };
+
+    if (!values.name) {
+        errors.name = "Enter your name.";
+    } else if (values.name.length > 60) {
+        errors.name = "Use 60 characters or fewer.";
+    }
+
+    if (!values.email) {
+        errors.email = "Enter your email address.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+        errors.email = "Enter an email address in a valid format.";
+    }
+
+    if (!values.park) {
+        errors.park = "Choose a featured park.";
+    } else if (!allowedParks.has(values.park)) {
+        errors.park = "Choose one of the featured parks.";
+    }
+
+    if (!values.date) {
+        errors.date = "Choose a date for your hike.";
+    } else if (Number.isNaN(new Date(`${values.date}T00:00:00`).getTime())) {
+        errors.date = "Enter a valid hike date.";
+    } else if (values.date < getLocalDateString()) {
+        errors.date = "Choose today or a future date.";
+    }
+
+    if (values.miles === null || !Number.isFinite(values.miles)) {
+        errors.miles = "Enter a planned distance.";
+    } else if (values.miles < 0.5 || values.miles > 15) {
+        errors.miles = "Choose a distance from 0.5 to 15 miles.";
+    }
+
+    if (!values.experience) {
+        errors.experience = "Choose your hiking experience.";
+    } else if (!experienceDistanceLimits[values.experience]) {
+        errors.experience = "Choose a listed experience level.";
+    } else if (Number.isFinite(values.miles) && values.miles > experienceDistanceLimits[values.experience]) {
+        errors.miles = `For a ${values.experience} hiker, choose no more than ${experienceDistanceLimits[values.experience]} miles.`;
+    }
+
+    return errors;
+}
+
+function displayHikeRequestErrors(errors, fieldNames = Object.keys(hikeRequestFields)) {
+    for (const fieldName of fieldNames) {
+        const message = errors[fieldName] || "";
+        hikeRequestErrors[fieldName].textContent = message;
+        hikeRequestFields[fieldName].setAttribute("aria-invalid", String(Boolean(message)));
+    }
+}
+
+function handleHikeRequestEdit(event) {
+    const fieldName = event.target.name;
+    if (!Object.hasOwn(hikeRequestFields, fieldName)) {
+        return;
+    }
+
+    const values = readHikeRequest();
+    const errors = validateHikeRequest(values);
+    const fieldsToUpdate = fieldName === "experience" ? ["experience", "miles"] : [fieldName];
+    displayHikeRequestErrors(errors, fieldsToUpdate);
+    hikeRequestFeedback.textContent = "";
+    hikeRequestFeedback.classList.remove("is-success");
+}
+
+hikeRequestForm.addEventListener("input", handleHikeRequestEdit);
+hikeRequestForm.addEventListener("change", handleHikeRequestEdit);
+
+hikeRequestForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    hikeRequestFeedback.textContent = "";
+    hikeRequestFeedback.classList.remove("is-success");
+
+    const values = readHikeRequest();
+    const errors = validateHikeRequest(values);
+    displayHikeRequestErrors(errors);
+
+    const firstInvalidField = Object.keys(errors)[0];
+    if (firstInvalidField) {
+        hikeRequestFeedback.textContent = "Please correct the highlighted fields to create your hike plan.";
+        hikeRequestFields[firstInvalidField].focus();
+        return;
+    }
+
+    const hikeRequest = {
+        name: values.name,
+        email: values.email.toLowerCase(),
+        park: values.park,
+        date: values.date,
+        miles: values.miles,
+        experience: values.experience
+    };
+
+    console.log("Hike plan request:", hikeRequest);
+    hikeRequestFeedback.classList.add("is-success");
+    hikeRequestFeedback.textContent = `Hike plan created for ${hikeRequest.name}: ${hikeRequest.miles} miles at ${hikeRequest.park} on ${hikeRequest.date}.`;
 });

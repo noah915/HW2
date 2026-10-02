@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trail Notes: Hiking and National Parks</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js?v=hw6" defer></script>
+    <script src="script.js?v=hw7" defer></script>
 </head>
 <body>
     <header>
@@ -90,6 +90,53 @@
                 </form>
                 <p id="trail-feedback" class="trail-feedback" role="status" aria-live="polite"></p>
                 <ul id="planned-trails" class="planned-trails" aria-label="Planned trail ideas"></ul>
+
+                <h3>Plan a park hike</h3>
+                <p>Share a few details to create a personal day-hike plan.</p>
+                <form id="hike-request-form" class="hike-request-form" novalidate>
+                    <div class="form-field">
+                        <label for="hiker-name">Your name</label>
+                        <input id="hiker-name" name="name" type="text" maxlength="60" autocomplete="name" required aria-describedby="hiker-name-error">
+                        <span id="hiker-name-error" class="field-error"></span>
+                    </div>
+                    <div class="form-field">
+                        <label for="hiker-email">Email address</label>
+                        <input id="hiker-email" name="email" type="email" autocomplete="email" required aria-describedby="hiker-email-error">
+                        <span id="hiker-email-error" class="field-error"></span>
+                    </div>
+                    <div class="form-field">
+                        <label for="hike-park">Choose a featured park</label>
+                        <select id="hike-park" name="park" required aria-describedby="hike-park-error">
+                            <option value="">Select a park</option>
+                            <option value="Yellowstone">Yellowstone</option>
+                            <option value="Grand Canyon">Grand Canyon</option>
+                            <option value="Acadia">Acadia</option>
+                        </select>
+                        <span id="hike-park-error" class="field-error"></span>
+                    </div>
+                    <div class="form-field">
+                        <label for="hike-date">Planned hike date</label>
+                        <input id="hike-date" name="date" type="date" required aria-describedby="hike-date-error">
+                        <span id="hike-date-error" class="field-error"></span>
+                    </div>
+                    <div class="form-field">
+                        <label for="hike-miles">Planned distance (miles)</label>
+                        <input id="hike-miles" name="miles" type="number" min="0.5" max="15" step="0.5" inputmode="decimal" required aria-describedby="hike-miles-error">
+                        <span id="hike-miles-error" class="field-error"></span>
+                    </div>
+                    <div class="form-field">
+                        <label for="hiking-experience">Hiking experience</label>
+                        <select id="hiking-experience" name="experience" required aria-describedby="hiking-experience-error">
+                            <option value="">Select your experience</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="experienced">Experienced</option>
+                        </select>
+                        <span id="hiking-experience-error" class="field-error"></span>
+                    </div>
+                    <button class="action-button" type="submit">Create hike plan</button>
+                </form>
+                <p id="hike-request-feedback" class="form-feedback" role="status" aria-live="polite"></p>
             </div>
         </section>
     </main>

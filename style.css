@@ -258,6 +258,12 @@ section li:last-child {
     outline-offset: 2px;
 }
 
+#trail-name,
+.hike-request-form input,
+.hike-request-form select {
+    font: inherit;
+}
+
 #trail-form label {
     display: block;
     margin-bottom: 0.35rem;
@@ -281,6 +287,66 @@ section li:last-child {
     border: 1px solid var(--line);
     border-radius: 3px;
     font: inherit;
+}
+
+.hike-request-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1rem;
+    max-width: 48rem;
+    margin-top: 1rem;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.form-field input,
+.form-field select {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.65rem;
+    background: #fff;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+}
+
+.form-field input:focus-visible,
+.form-field select:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+}
+
+.form-field [aria-invalid="true"] {
+    border-color: #a12828;
+}
+
+.field-error {
+    display: block;
+    margin-top: 0.2rem;
+    color: #a12828;
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.field-error:empty {
+    display: none;
+}
+
+.form-feedback {
+    margin: 0.75rem 0 0;
+    color: #a12828;
+}
+
+.form-feedback.is-success {
+    padding: 0.65rem 0.8rem;
+    background: #e5f1e8;
+    color: var(--forest-dark);
+    border-left: 4px solid var(--pine);
 }
 
 .planned-trails:empty {
@@ -336,6 +402,14 @@ footer p {
     }
 
     .trail-form-controls .action-button {
+        width: 100%;
+    }
+
+    .hike-request-form {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hike-request-form > .action-button {
         width: 100%;
     }
 
