@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trail Notes: Hiking and National Parks</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js?v=hw7" defer></script>
+    <script src="script.js?v=hw8" defer></script>
 </head>
 <body>
     <header>
@@ -17,6 +17,7 @@
                 <li><a href="#about">About the outdoors</a></li>
                 <li><a href="#parks">Featured parks</a></li>
                 <li><a href="#checklist">Hiking checklist</a></li>
+                <li><a href="#trail-notes">Trail notes</a></li>
             </ul>
         </nav>
     </header>
@@ -62,6 +63,28 @@
                     </tr>
                 </tbody>
             </table>
+        </section>
+
+        <section id="trail-notes">
+            <h2>Community Trail Notes</h2>
+            <p>This sample feed uses JSONPlaceholder. New notes are simulated and are not permanently saved.</p>
+            <p id="post-feed-status" class="api-status" role="status" aria-live="polite">Loading sample trail notes...</p>
+            <ul id="post-feed-list" class="post-feed" aria-label="Sample trail notes"></ul>
+
+            <h3>Share a trail note</h3>
+            <form id="trail-post-form" class="trail-post-form">
+                <div class="form-field">
+                    <label for="post-title">Note title</label>
+                    <input id="post-title" name="title" type="text" maxlength="80" required>
+                </div>
+                <div class="form-field">
+                    <label for="post-body">Trail update</label>
+                    <textarea id="post-body" name="body" rows="4" maxlength="500" required></textarea>
+                </div>
+                <button id="post-submit-button" class="action-button" type="submit">Submit note</button>
+            </form>
+            <p id="post-submit-feedback" class="api-status" role="status" aria-live="polite"></p>
+            <div id="post-response" class="post-response" aria-live="polite"></div>
         </section>
 
         <section id="checklist">

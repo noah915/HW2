@@ -77,8 +77,17 @@ const hikeRequestErrors = {
     experience: document.querySelector("#hiking-experience-error")
 };
 const hikeRequestFeedback = document.querySelector("#hike-request-feedback");
+const postFeedStatus = document.querySelector("#post-feed-status");
+const postFeedList = document.querySelector("#post-feed-list");
+const trailPostForm = document.querySelector("#trail-post-form");
+const postTitleInput = document.querySelector("#post-title");
+const postBodyInput = document.querySelector("#post-body");
+const postSubmitButton = document.querySelector("#post-submit-button");
+const postSubmitFeedback = document.querySelector("#post-submit-feedback");
+const postResponse = document.querySelector("#post-response");
 const originalChecklistIntro = checklistIntro.textContent;
 const allowedParks = new Set(featuredParks.map((park) => park.name));
+const postsEndpoint = "https://jsonplaceholder.typicode.com/posts";
 
 function getLocalDateString(date = new Date()) {
     const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -256,3 +265,105 @@ hikeRequestForm.addEventListener("submit", (event) => {
     hikeRequestFeedback.classList.add("is-success");
     hikeRequestFeedback.textContent = `Hike plan created for ${hikeRequest.name}: ${hikeRequest.miles} miles at ${hikeRequest.park} on ${hikeRequest.date}.`;
 });
+
+function createPostCard(post) {
+    const article = document.createElement("article");
+    article.classList.add("post-card");
+
+    const recordLabel = document.createElement("p");
+    recordLabel.classList.add("post-record-label");
+    recordLabel.textContent = `JSONPlaceholder record #${post.id}`;
+
+    const title = document.createElement("h3");
+    title.textContent = post.title;
+
+    const body = document.createElement("p");
+    body.textContent = post.body;
+
+    article.append(recordLabel, title, body);
+    return article;
+}
+
+function renderPostList(posts) {
+    const postItems = posts.map((post) => {
+        const listItem = document.createElement("li");
+        listItem.append(createPostCard(post));
+        return listItem;
+    });
+
+    postFeedList.replaceChildren(...postItems);
+}
+
+async function loadTrailNotes() {
+    postFeedStatus.textContent = "Loading sample trail notes...";
+    postFeedList.replaceChildren();
+
+    try {
+        const response = await fetch(`${postsEndpoint}?_limit=5`);
+        if (!response.ok) {
+            throw new Error(`Trail notes request failed with status ${response.status}.`);
+        }
+
+        const posts = await response.json();
+        if (!Array.isArray(posts)) {
+            throw new Error("Trail notes response was not a list.");
+        }
+
+        renderPostList(posts);
+        postFeedStatus.textContent = `Loaded ${posts.length} sample trail notes from JSONPlaceholder.`;
+    } catch (error) {
+        console.error("Could not load sample trail notes:", error);
+        postFeedStatus.textContent = "Sample trail notes are unavailable right now. Please try again later.";
+    }
+}
+
+trailPostForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    postSubmitFeedback.textContent = "";
+    postResponse.replaceChildren();
+
+    const payload = {
+        title: postTitleInput.value.trim(),
+        body: postBodyInput.value.trim(),
+        userId: 1
+    };
+
+    if (!payload.title || !payload.body) {
+        postSubmitFeedback.textContent = "Add a title and a trail update before submitting.";
+        (!payload.title ? postTitleInput : postBodyInput).focus();
+        return;
+    }
+
+    postSubmitButton.disabled = true;
+    postSubmitFeedback.textContent = "Sending your trail note...";
+
+    try {
+        const response = await fetch(postsEndpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8"
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            throw new Error(`Trail note request failed with status ${response.status}.`);
+        }
+
+        const createdPost = await response.json();
+        if (!createdPost || !Number.isInteger(createdPost.id)) {
+            throw new Error("Trail note response did not include a record ID.");
+        }
+
+        console.log("JSONPlaceholder POST response:", createdPost);
+        postResponse.replaceChildren(createPostCard(createdPost));
+        postSubmitFeedback.textContent = `JSONPlaceholder returned simulated record #${createdPost.id}.`;
+        trailPostForm.reset();
+    } catch (error) {
+        console.error("Could not submit trail note:", error);
+        postSubmitFeedback.textContent = "Your trail note could not be submitted. Please try again.";
+    } finally {
+        postSubmitButton.disabled = false;
+    }
+});
+
+loadTrailNotes();
